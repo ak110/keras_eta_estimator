@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="ja">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css" integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous">
+  <title>Keras ETA Estimator</title>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="row">Keras ETA Estimator</h1>
+
+    <div class="text-muted mb-3">
+      Kerasのログから残り時間を算出するHTMLファイル。
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <h2 style="border-bottom: solid 1px #ccc;">ログ</h2>
+        <form action="" class="mb-5">
+          <div class="form-group">
+            <textarea id="log" rows="10" class="form-control" style="white-space: nowrap; overflow: scroll;"></textarea>
+          </div>
+          <div class="form-group text-right">
+            <button type="button" id="btn_example" class="btn btn-secondary">例を入力</button>
+            <button type="button" id="btn_clear" class="btn btn-primary">クリア</button>
+          </div>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <h2 style="border-bottom: solid 1px #ccc;">ログ解析結果</h2>
+        <div class="ml-md-3 mr-md-3 mb-3">
+          <div class="row mb-1">
+            <div class="col-5">Epoch数 (現在 / 全体)</div>
+            <div class="col-7">
+              <input id="epoch" type="number" class="form-control text-right" style="display: inline; width: 6em;">
+              <label>/</label>
+              <input id="epochs" type="number" class="form-control text-right" style="display: inline; width: 6em;">
+            </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col-5">処理時間</div>
+            <div class="col-7">
+              <input id="seconds_per_epoch" type="number" class="form-control text-right" style="display: inline; width: 13em;"> [秒/Epoch]
+            </div>
+          </div>
+        </div>
+
+        <h2 style="border-bottom: solid 1px #ccc;">計算結果</h2>
+        <div class="ml-md-3 mr-md-3 mb-3">
+          <div class="row mb-1">
+            <div class="col-5">残りEpoch数</div>
+            <div class="col-7">
+              <input id="remain_epochs" type="number" class="form-control text-right" style="display: inline; width: 13em;" readonly>
+            </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col-5">推定残り時間</div>
+            <div class="col-7">
+              <input id="remain_time" type="text" class="form-control text-right" style="display: inline; width: 13em;" readonly>
+            </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col-5">推定総処理時間</div>
+            <div class="col-7">
+              <input id="total_time" type="text" class="form-control text-right" style="display: inline; width: 13em;" readonly>
+            </div>
+          </div>
+          <div class="row mb-1">
+            <div class="col-5">推定完了時刻</div>
+            <div class="col-7">
+              <input id="eta" type="text" class="form-control text-right" style="display: inline; width: 13em;" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <pre id="log_example" class="d-none">==============] - 1129s 5s/step - loss: 0.5196 - acc: 0.7654 - val_loss: 0.4812 - val_acc: 0.8103                         
+Epoch 80/300                                                                                                              
+224/224 [==============================] - 1125s 5s/step - loss: 0.5357 - acc: 0.7546 - val_loss: 0.5039 - val_acc: 0.7998
+Epoch 81/300                                                                                                              
+224/224 [==============================] - 1105s 5s/step - loss: 0.5177 - acc: 0.7674 - val_loss: 0.4826 - val_acc: 0.8036
+Epoch 82/300                                                                                                              
+224/224 [==============================] - 1084s 5s/step - loss: 0.5163 - acc: 0.7652 - val_loss: 0.4707 - val_acc: 0.8115
+Epoch 83/300                                                                                                              
+224/224 [==============================] - 1098s 5s/step - loss: 0.5283 - acc: 0.7554 - val_loss: 0.4924 - val_acc: 0.8026
+Epoch 84/300                                                                                                              
+224/224 [==============================] - 1087s 5s/step - loss: 0.5257 - acc: 0.7600 - val_loss: 0.4821 - val_acc: 0.8090
+Epoch 85/300                                                                                                              
+224/224 [==============================] - 1119s 5s/step - loss: 0.5214 - acc: 0.7621 - val_loss: 0.4821 - val_acc: 0.8073
+Epoch 86/300                                                                                                              
+224/224 [==============================] - 1130s 5s/step - loss: 0.5247 - acc: 0.7570 - val_loss: 0.4681 - val_acc: 0.8108
+Epoch 87/300                                                                                                              
+224/224 [==============================] - 1085s 5s/step - loss: 0.5090 - acc: 0.7609 - val_loss: 0.4894 - val_acc: 0.8175
+Epoch 88/30</pre>
+
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
+  <script>
+    var regex_match = function (re, str) {
+      var m, r = [];
+      while ((m = re.exec(str)) !== null) {
+        r.push(m.slice(1));
+      }
+      return r;
+    };
+    var ema = function (a) {
+      var alpha = 0.8;
+      return a.reduce((a, b) => a * alpha + b * (1 - alpha), a[0]);
+    };
+    var seconds_to_str = function (s) {
+      var str = "";
+      if (s >= 86400) {
+        str += Math.floor(s / 86400).toString() + "日";
+      }
+      if (s >= 3600) {
+        str += Math.floor((s % 86400) / 3600).toString() + "時間";
+      }
+      str += Math.ceil((s % 3600) / 60).toString() + "分";
+      return str;
+    };
+    $(function () {
+      // 例を入力ボタン
+      $("#btn_example").click(function () {
+        $("#log").val($("#log_example").text()).change();
+      });
+      // クリアボタン
+      $("#btn_clear").click(function () {
+        $("#log").val("").change();
+      });
+      // フォーカス時にコピペしやすいように全選択
+      $("#log").focus(function () {
+        $(this).select();
+      });
+      // ログをparseしてepoch数などを算出
+      $("#log").on("keyup paste change", function () {
+        var log = $(this).val().replace(/\s+$/gm, ""); // 行末のスペースを削除
+        var matches1 = regex_match(/^\s*Epoch\s+(\d+)\/(\d+)\s*$/gm, log);
+        var matches2 = regex_match(/^\s*(\d+\/\d+[ \[\]=]+)? - (\d+)s /gm, log);
+        if (matches1.length == 0 || matches2.length == 0) {
+          $("#epoch").val("");
+          $("#epochs").val("");
+          $("#seconds_per_epoch").val("").change();
+        } else {
+          var epoch = matches1.map(x => parseInt(x[0])).reduce((a, b) => Math.max(a, b));
+          var epochs = matches1.map(x => parseInt(x[1])).reduce((a, b) => Math.max(a, b));
+          var seconds_per_epoch = Math.ceil(ema(matches2.map(x => parseInt(x[1]))));
+          $("#epoch").val(epoch);
+          $("#epochs").val(epochs);
+          $("#seconds_per_epoch").val(seconds_per_epoch).change();
+        }
+      });
+      // 残り時間などを計算
+      $("#epoch,#epochs,#seconds_per_epoch").on("keyup paste change", function () {
+        var epoch = $("#epoch").val();
+        var epochs = $("#epochs").val();
+        var seconds_per_epoch = $("#seconds_per_epoch").val();
+        if (epoch === "" || epochs === "" || seconds_per_epoch === "") {
+          $("#remain_epochs").val("");
+          $("#remain_time").val("");
+          $("#eta").val("");
+          $("#total_time").val("");
+        } else {
+          var remain_epochs = epochs - epoch + 1;
+          var remain_seconds = seconds_per_epoch * remain_epochs;
+          var eta = new Date(new Date().getTime() + remain_seconds * 1000);
+          var total_seconds = seconds_per_epoch * epochs;
+          $("#remain_epochs").val(remain_epochs);
+          $("#remain_time").val(seconds_to_str(remain_seconds));
+          $("#eta").val(eta.toLocaleString());
+          $("#total_time").val(seconds_to_str(total_seconds));
+        }
+      });
+      // 初期値に対して計算
+      $("#log").change();
+    });
+  </script>
+</body>
+
+</html>
