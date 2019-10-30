@@ -141,7 +141,7 @@ Epoch 88/30</pre>
       $("#log").on("keyup paste change", function () {
         var log = $(this).val().replace(/\s+$/gm, ""); // 行末のスペースを削除
         var matches1 = regex_match(/^\s*Epoch\s+(\d+)\/(\d+)\s*$/gm, log);
-        var matches2 = regex_match(/^\s*(\d+\/\d+[ \[\]=]+)? - (\d+)s /gm, log);
+        var matches2 = regex_match(/^\s*(\d+\/\d+[ \[\]=]*)? - (\d+)s /gm, log);
         if (matches1.length == 0 || matches2.length == 0) {
           $("#epoch").val("");
           $("#epochs").val("");
